@@ -1,0 +1,24 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+
+# DENTEX is licensed separately and must never be committed.
+data/raw/
+data/interim/
+data/processed/
+artifacts/
+weights/
+runs/
+*.pt
+*.pth
+*.onnx
+
+.env
+.env.*
+!.env.example
+

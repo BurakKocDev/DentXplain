@@ -1,0 +1,32 @@
+{
+  "dataset": "ibrahimhamamci/DENTEX",
+  "revision": "main",
+  "source_url": "https://huggingface.co/datasets/ibrahimhamamci/DENTEX",
+  "paper": "https://arxiv.org/abs/2305.19112",
+  "challenge_code": "https://github.com/ibrahimethemhamamci/DENTEX",
+  "baseline_code": "https://github.com/ibrahimethemhamamci/HierarchicalDet",
+  "total_download_bytes_reported": 11800000000,
+  "archives": {
+    "training_data.zip": 10900000000,
+    "validation_data.zip": 150000000,
+    "test_data.zip": 765000000
+  },
+  "expected_subsets": {
+    "quadrant_only": 693,
+    "quadrant_enumeration": 634,
+    "fully_annotated_total": 1005,
+    "fully_annotated_train": 705,
+    "fully_annotated_validation": 50,
+    "fully_annotated_test": 250,
+    "unlabeled": 1571
+  },
+  "diagnoses": [
+    "Impacted",
+    "Caries",
+    "Periapical Lesion",
+    "Deep Caries"
+  ],
+  "working_license": "CC BY-NC-SA 4.0",
+  "license_policy": "Use the most restrictive current source until the publisher resolves conflicting labels."
+}
+
