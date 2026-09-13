@@ -1,15 +1,15 @@
 {
   "dataset": "ibrahimhamamci/DENTEX",
-  "revision": "main",
+  "revision": "7b27ccc8e342dcb774f69adc6ca5e6c09fefce93",
   "source_url": "https://huggingface.co/datasets/ibrahimhamamci/DENTEX",
   "paper": "https://arxiv.org/abs/2305.19112",
   "challenge_code": "https://github.com/ibrahimethemhamamci/DENTEX",
   "baseline_code": "https://github.com/ibrahimethemhamamci/HierarchicalDet",
-  "total_download_bytes_reported": 11800000000,
+  "total_download_bytes_reported": 11841738199,
   "archives": {
-    "training_data.zip": 10900000000,
-    "validation_data.zip": 150000000,
-    "test_data.zip": 765000000
+    "training_data.zip": 10927391529,
+    "validation_data.zip": 149512256,
+    "test_data.zip": 764834414
   },
   "expected_subsets": {
     "quadrant_only": 693,
@@ -29,4 +29,3 @@
   "working_license": "CC BY-NC-SA 4.0",
   "license_policy": "Use the most restrictive current source until the publisher resolves conflicting labels."
 }
-

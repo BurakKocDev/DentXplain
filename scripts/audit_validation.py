@@ -14,7 +14,7 @@ from dentxplain.data import audit_annotations, load_annotations
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Audit DENTEX validation data")
     parser.add_argument("--annotations", type=Path, required=True)
-    parser.add_argument("--images", type=Path, required=True)
+    parser.add_argument("--images", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     return parser.parse_args()
 
@@ -84,8 +84,9 @@ def main() -> int:
         "annotation_file": str(args.annotations),
         "annotation_sha256": file_sha256(args.annotations),
         "annotations": audit_annotations(payload),
-        "images": audit_image_files(args.images, payload),
     }
+    if args.images is not None:
+        report["images"] = audit_image_files(args.images, payload)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2))
@@ -94,4 +95,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

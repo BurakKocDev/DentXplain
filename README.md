@@ -15,7 +15,9 @@ review status. It is not a diagnostic or treatment system.
 - Official source and archive sizes recorded.
 - Validation annotation schema inspected.
 - Validation image archive downloaded locally for integrity and visual review.
-- Full 10.9 GB training archive intentionally deferred until the gate passes.
+- Full training/test archive structures and label schemas inspected remotely.
+- The experiment contract is frozen; the resumable training archive download is
+  the next data-preparation step.
 
 ## Dataset boundary
 
@@ -44,6 +46,6 @@ python scripts/audit_validation.py `
 python -m pytest -q
 ```
 
-See [the data-gate record](docs/data_gate.md) for confirmed facts, risks, and the
-decision required before the full dataset download.
-
+See [the data-gate record](docs/data_gate.md) for confirmed facts and risks, and
+[the experiment contract](docs/experiment_contract_v1.md) for the leakage-safe
+evaluation boundary and ordered model ladder.

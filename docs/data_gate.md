@@ -38,6 +38,26 @@ download is deferred.**
 - The ZIP also contains one `.ipynb_checkpoints` image copy. Audit code excludes
   checkpoint paths explicitly.
 
+## Remote training/test archive inspection
+
+The ZIP central directories were read with HTTP byte ranges; the full archives
+were not downloaded.
+
+- Training ZIP: 10,927,391,529 compressed bytes, 14,725,611,903 uncompressed
+  bytes, 3,603 PNG files and three annotation JSON files.
+- Training subsets exactly match the published counts: 693 quadrant images with
+  2,772 boxes; 634 quadrant+enumeration images with 18,095 tooth boxes; 705 fully
+  annotated images with 3,529 abnormal-tooth boxes; and 1,571 unlabeled images.
+- The 705-image fully annotated training JSON has no invalid/orphan/out-of-bounds
+  boxes. It includes 2,189 Caries, 604 Impacted, 578 Deep Caries, and 158
+  Periapical Lesion annotations. Twenty-seven images have no target annotation.
+- Test ZIP: 764,834,414 compressed bytes, 1,028,272,323 uncompressed bytes, 250
+  PNG images and 250 per-image LabelMe JSON files.
+- The test LabelMe labels use a broader Turkish coded ontology than the four-class
+  training COCO schema. The inspected sample includes `çürük`, `küretaj`, `kanal`,
+  `çekim`, `gömülü`, `lezyon`, and `kırık`. No unverified collapse of these labels
+  into the four benchmark diagnoses is allowed.
+
 ## Forty-image visual review
 
 The deterministic contact sheet at
@@ -61,9 +81,9 @@ from this code repository.
 
 - Quadrant-only and quadrant+enumeration records are partially labeled. Missing
   diagnosis labels are unknown, not negative.
-- Challenge test labels were historically hidden; current public availability and
-  exact ground-truth contents must be verified from the downloaded archives before
-  defining a frozen benchmark.
+- Challenge test labels were historically hidden. They are now present, but use a
+  broader raw ontology than the four-class benchmark schema. The test archive is
+  exploratory until an owner-supported mapping is documented.
 - The public data description alternates between “three institutions with varying
   equipment/protocols” and “one VistaPano S unit under a standardized protocol.”
   Source/institution metadata must be inspected before any domain-shift claim.
@@ -78,13 +98,22 @@ from this code repository.
 - [x] Conservative license policy selected
 - [x] Validation ZIP integrity and image/annotation pairing confirmed
 - [x] At least 40 validation examples visually reviewed
-- [ ] Full training archive tree and annotation levels confirmed
+- [x] Full training/test archive trees and annotation levels confirmed remotely
 - [ ] Duplicate and near-duplicate policy defined
-- [ ] Frozen development/test protocol defined without test leakage
-- [ ] Disk and GPU budget approved
+- [x] Frozen development/test protocol defined without test leakage
+- [x] Disk and GPU budget approved
 
 ## Download decision
 
-Do not download the 10.9 GB training archive until validation integrity and visual
-audit pass. With approximately 36.7 GB free before extraction, compressed plus
-expanded copies require deliberate disk management.
+Validation integrity and visual audit passed. The 10.9 GB training archive may be
+downloaded only with a deliberate disk plan: its indexed uncompressed size is
+14.73 GB, so keeping both compressed and expanded copies would consume about
+25.65 GB before caches, manifests, and model artifacts. The selected plan keeps
+the compressed archive temporarily and extracts only the 705-image full-label
+directory (~2.69 GB) plus the 634-image enumeration directory (~2.15 GB). At the
+start of the download the C: drive had 36.08 GiB free.
+
+The available NVIDIA GeForce RTX 3050 Ti Laptop GPU has 4 GiB VRAM. B0 therefore
+starts at 640 px with automatic mixed precision, then uses a 960/1,024 px
+rectangular main run with batch size 1 and gradient accumulation. A 1,280 px run
+is not part of the default plan.
