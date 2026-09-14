@@ -34,9 +34,17 @@
     .summary strong{font-size:20px;display:block;margin:5px 0}.row{display:flex;justify-content:space-between;
       gap:12px;padding:9px 0;border-bottom:1px solid #253949;color:var(--muted)}.row b{color:var(--text)}
     .finding{padding:13px 0;border-bottom:1px solid var(--line)}.finding-head{display:flex;
-      justify-content:space-between;gap:8px}.finding-title{font-weight:800}.tag{padding:3px 8px;border-radius:99px;
+      justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.finding-title{font-weight:800}.tag{padding:3px 8px;border-radius:99px;
       color:#05201c;background:#65dfab;font-size:11px;font-weight:800}.tag.review{background:var(--amber);color:#2c1c00}
-    .finding-meta{color:var(--muted);font-size:12px;margin-top:6px}.download{margin-top:16px;width:100%}
+    .finding-badges{display:flex;gap:6px;align-items:center}.confidence{padding:3px 8px;border-radius:99px;
+      font-size:11px;font-weight:800}.confidence.high{background:#ff8c80;color:#2d0804}.confidence.medium{background:#ffbd68;color:#2b1700}
+    .confidence.low{background:#314555;color:#d4e1e8}.finding-meta{color:var(--muted);font-size:12px;margin-top:6px}
+    .low-findings{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:0 12px}.low-findings summary{
+      cursor:pointer;color:var(--muted);font-size:12px;font-weight:750;padding:11px 0}.visual-filter{display:flex;
+      justify-content:space-between;align-items:center;gap:10px;margin-top:15px;color:var(--muted);font-size:12px}
+    .filter-actions{display:flex;gap:6px}.filter-actions button{padding:7px 10px;font-size:11px;background:#20313f;color:var(--muted)}
+    .filter-actions button.active{background:var(--cyan);color:#06211e}.view-note{color:var(--muted);font-size:11px;margin-top:8px}
+    .explain{padding:12px 0 0;color:var(--muted);font-size:11px;line-height:1.55}.download{margin-top:16px;width:100%}
     .notice{font-size:11px;color:#78909e;line-height:1.5;margin-top:20px}
     @media(max-width:880px){main{grid-template-columns:1fr}.drop{min-height:430px}.results{min-height:420px}}
   </style>
@@ -62,10 +70,17 @@
       <div class="empty" id="empty">Henüz sonuç yok.</div><div id="result">
         <div class="summary"><span class="muted">C1 ÖZETİ</span><strong id="title"></strong>
           <span class="muted" id="note"></span></div>
-        <div class="row"><span>Aday bulgu</span><b id="candidate-count"></b></div>
-        <div class="row"><span>FDI atanmış</span><b id="assigned-count"></b></div>
+        <div class="row"><span>Ham model adayı</span><b id="candidate-count"></b></div>
+        <div class="row"><span>Sunulan bulgu</span><b id="presented-count"></b></div>
+        <div class="row"><span>FDI atanmış (ham)</span><b id="assigned-count"></b></div>
         <div class="row"><span>Numaralandırmada çekimser</span><b id="abstained-count"></b></div>
-        <div id="findings"></div><button class="secondary download" id="download">İşaretli PNG indir</button>
+        <div id="findings"></div><details class="low-findings" id="low-section"><summary id="low-summary"></summary>
+          <div id="low-list"></div></details>
+        <div class="visual-filter"><span>İşaretli görüntüde göster</span><span class="filter-actions">
+          <button id="priority-view" class="active">Öncelikli</button><button id="all-view">Tümü</button></span></div>
+        <div class="view-note" id="view-note"></div><div class="explain">Bulgu güveni patoloji adayının model skorudur. FDI eşleme skoru ise yalnızca
+          aday kutunun diş numarasıyla geometrik uyumunu gösterir; tanı güveni değildir. Kesik kutular düşük skorlu adayları belirtir.</div>
+        <button class="secondary download" id="download">İşaretli PNG indir</button>
       </div><div class="notice">Araştırma prototipidir. Sonuçlar uzman incelemesi gerektirir;
         tanı veya tedavi kararı amacıyla kullanılamaz.</div>
     </aside>
@@ -77,36 +92,68 @@
   const ctx=canvas.getContext('2d'),toolbar=document.querySelector('#toolbar');
   const empty=document.querySelector('#empty'),loader=document.querySelector('#loader');
   const result=document.querySelector('#result'),error=document.querySelector('#error');
-  let selected=null,image=null,last=null,url=null;
+  let selected=null,image=null,last=null,url=null,displayGroups=[],viewAll=false;
   const colors={"Impacted":"#ffad66","Caries":"#ff5c72","Periapical Lesion":"#ad7cff","Deep Caries":"#ffd45d"};
+  function confidenceTier(value){return value>=.5?{key:'high',label:'Üst seviye'}:
+    value>=.35?{key:'medium',label:'Orta seviye'}:{key:'low',label:'Düşük seviye'}}
+  function groupFindings(findings){const groups=[];findings.forEach((finding,index)=>{
+    const family=['Caries','Deep Caries'].includes(finding.diagnosis)?'caries-family':finding.diagnosis;
+    const key=finding.fdi?`${finding.fdi}:${family}`:`raw-${index}`;let group=groups.find(item=>item.key===key);
+    if(!group){group={key,members:[],...finding};groups.push(group)}group.members.push(finding);
+    if(finding.confidence>group.confidence)Object.assign(group,finding,{key,members:group.members})});
+    return groups.map(group=>{const diagnoses=[...new Set(group.members.map(item=>item.diagnosis))];return {...group,
+      diagnosis:diagnoses.length>1?'Caries / Deep Caries':diagnoses[0],colorDiagnosis:group.members[0].diagnosis,
+      rawCount:group.members.length,componentSummary:group.members.length>1?group.members.map(item=>
+        `${item.diagnosis} %${(item.confidence*100).toFixed(1)}`).join(' + '):''}}).sort((a,b)=>b.confidence-a.confidence)}
   function fail(message){error.textContent=message;error.style.display='block'}
   function render(findings=[]){if(!image)return;canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
-    ctx.drawImage(image,0,0);const lw=Math.max(4,Math.round(Math.min(canvas.width,canvas.height)/350));
-    ctx.lineWidth=lw;ctx.font=`bold ${Math.max(20,lw*3)}px system-ui`;findings.forEach(f=>{
-      const [x1,y1,x2,y2]=f.box_xyxy,color=colors[f.diagnosis]||'#55e3d1';ctx.strokeStyle=color;
-      ctx.fillStyle=color;ctx.strokeRect(x1,y1,x2-x1,y2-y1);const label=`${f.diagnosis} · ${f.fdi?'FDI '+f.fdi:'FDI ?'} · ${Math.round(f.confidence*100)}%`;
-      const w=ctx.measureText(label).width+18,h=Math.max(30,lw*4),ly=Math.max(0,y1-h);ctx.fillRect(x1,ly,w,h);
-      ctx.fillStyle='#071018';ctx.fillText(label,x1+9,ly+h-7)})}
+    ctx.drawImage(image,0,0);const shortest=Math.min(canvas.width,canvas.height);
+    const lw=Math.max(4,Math.round(shortest/350)),fontSize=Math.max(30,Math.round(shortest/55));
+    const labelHeight=fontSize+18,labelRects=[];ctx.lineWidth=lw;ctx.font=`bold ${fontSize}px system-ui`;
+    findings.forEach((f,index)=>{
+      const [x1,y1,x2,y2]=f.box_xyxy,color=colors[f.colorDiagnosis||f.diagnosis]||'#55e3d1';ctx.strokeStyle=color;
+      const tier=confidenceTier(f.confidence);ctx.setLineDash(tier.key==='low'?[lw*2,lw]:[]);
+      ctx.strokeRect(x1,y1,x2-x1,y2-y1);ctx.setLineDash([]);
+      const label=`#${index+1} ${f.diagnosis} · ${f.fdi?'FDI '+f.fdi:'FDI ?'} · ${Math.round(f.confidence*100)}%`;
+      const w=Math.min(canvas.width,ctx.measureText(label).width+24),h=labelHeight;
+      let lx=Math.min(Math.max(0,x1),Math.max(0,canvas.width-w)),ly=Math.max(0,y1-h-4);
+      const overlaps=()=>labelRects.some(r=>lx<r.x+r.w&&lx+w>r.x&&ly<r.y+r.h&&ly+h>r.y);
+      while(overlaps()&&ly>0)ly=Math.max(0,ly-h-4);
+      if(overlaps()){ly=Math.min(canvas.height-h,y2+4);while(overlaps()&&ly<canvas.height-h)ly=Math.min(canvas.height-h,ly+h+4)}
+      labelRects.push({x:lx,y:ly,w,h});ctx.fillStyle=color;ctx.fillRect(lx,ly,w,h);
+      ctx.fillStyle='#071018';ctx.fillText(label,lx+12,ly+h-9)})}
   function select(file){error.style.display='none';if(!file||!['image/jpeg','image/png','image/webp'].includes(file.type))
       return fail('JPEG, PNG veya WebP seçin.');if(file.size>25*1024*1024)return fail('25 MiB sınırı aşıldı.');
-    selected=file;if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(file);image=new Image();
+    selected=file;displayGroups=[];viewAll=false;if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(file);image=new Image();
     image.onload=()=>render();image.src=url;intro.style.display='none';canvas.style.display='block';
     toolbar.style.display='flex';document.querySelector('#filename').textContent=`${file.name} · ${(file.size/1048576).toFixed(2)} MiB`;
     empty.textContent='Görüntü hazır. Analiz etmek için düğmeye basın.';empty.style.display='block';result.style.display='none'}
-  function show(data){last=data;const s=data.summary;document.querySelector('#title').textContent=s.candidate_count?
+  function findingHtml(f,i){const tier=confidenceTier(f.confidence);return `<div class="finding"><div class="finding-head">
+      <span class="finding-title">#${i+1} ${f.diagnosis}</span><span class="finding-badges"><span class="confidence ${tier.key}">${tier.label}</span>
+      <span class="tag ${f.fdi?'':'review'}">${f.fdi?'FDI '+f.fdi:'FDI çekimser'}</span></span></div>
+      <div class="finding-meta">Bulgu güveni %${(f.confidence*100).toFixed(1)}${f.match_score==null?'':` · FDI eşleme %${(f.match_score*100).toFixed(1)}`}
+      ${f.rawCount>1?`<br>Aynı dişteki ${f.rawCount} ham aday birleştirildi: ${f.componentSummary}`:''}</div></div>`}
+  function applyView(){const visible=viewAll?displayGroups:displayGroups.filter(f=>f.confidence>=.35);render(visible);
+    const hidden=displayGroups.length-visible.length;document.querySelector('#view-note').textContent=viewAll?
+      `Görselde ${visible.length} bulgunun tamamı gösteriliyor.`:`Görselde ${visible.length} öncelikli bulgu gösteriliyor${hidden?`; ${hidden} düşük seviyeli bulgu gizlendi.`:'.'}`;
+    document.querySelector('#priority-view').classList.toggle('active',!viewAll);document.querySelector('#all-view').classList.toggle('active',viewAll)}
+  function show(data){last=data;const s=data.summary;displayGroups=groupFindings(data.findings);viewAll=false;
+    const primary=displayGroups.filter(f=>f.confidence>=.35),low=displayGroups.filter(f=>f.confidence<.35);
+    document.querySelector('#title').textContent=s.candidate_count?
       'Uzman incelemesi için adaylar bulundu':'Eşik üstü aday bulunmadı';document.querySelector('#note').textContent=
       'Bu çıktı tanı değildir; her sonuç uzman tarafından değerlendirilmelidir.';
-    document.querySelector('#candidate-count').textContent=s.candidate_count;document.querySelector('#assigned-count').textContent=s.assigned_count;
+    document.querySelector('#candidate-count').textContent=s.candidate_count;document.querySelector('#presented-count').textContent=displayGroups.length;
+    document.querySelector('#assigned-count').textContent=s.assigned_count;
     document.querySelector('#abstained-count').textContent=s.enumeration_abstained_count;
-    document.querySelector('#findings').innerHTML=data.findings.map((f,i)=>`<div class="finding"><div class="finding-head">
-      <span class="finding-title">#${i+1} ${f.diagnosis}</span><span class="tag ${f.fdi?'':'review'}">${f.fdi?'FDI '+f.fdi:'FDI çekimser'}</span></div>
-      <div class="finding-meta">Bulgu güveni %${(f.confidence*100).toFixed(1)}${f.match_score==null?'':` · eşleme %${(f.match_score*100).toFixed(1)}`}</div></div>`).join('');
-    render(data.findings);loader.style.display='none';result.style.display='block'}
+    document.querySelector('#findings').innerHTML=primary.map(findingHtml).join('');document.querySelector('#low-list').innerHTML=
+      low.map((f,i)=>findingHtml(f,primary.length+i)).join('');document.querySelector('#low-summary').textContent=`Düşük seviyeli adaylar (${low.length})`;
+    document.querySelector('#low-section').style.display=low.length?'block':'none';applyView();loader.style.display='none';result.style.display='block'}
   async function analyze(){if(!selected)return;error.style.display='none';empty.style.display='none';result.style.display='none';
     loader.style.display='block';const form=new FormData();form.append('file',selected);try{const response=await fetch('/v1/predict',{method:'POST',body:form});
       const data=await response.json();if(!response.ok)throw new Error(data.detail||'Analiz başarısız.');show(data)}catch(reason){
       loader.style.display='none';empty.style.display='block';fail(reason.message||'Sunucuya ulaşılamadı.')}}
   document.querySelector('#choose').onclick=()=>fileInput.click();document.querySelector('#change').onclick=()=>fileInput.click();
+  document.querySelector('#priority-view').onclick=()=>{viewAll=false;applyView()};document.querySelector('#all-view').onclick=()=>{viewAll=true;applyView()};
   document.querySelector('#analyze').onclick=analyze;fileInput.onchange=()=>select(fileInput.files[0]);
   ['dragenter','dragover'].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.add('drag')}));
   ['dragleave','drop'].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.remove('drag')}));
