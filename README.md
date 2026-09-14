@@ -35,6 +35,9 @@ complete.** C1 is selected; B0 pathology errors are now the primary bottleneck.
   untouched.
 - Thresholded B0 error analysis confirms Periapical Lesion recall (0.259) and
   Caries false positives (290) as the priorities for the next controlled ablation.
+- B0-R1 whole-image rare-class resampling was tested and rejected: AP50-95 fell
+  from 0.369 to 0.355 and Periapical Lesion did not improve. The original B0
+  checkpoint remains selected.
 
 ## Dataset boundary
 
@@ -80,4 +83,5 @@ evaluation boundary and ordered model ladder. The complete B0 interpretation is
 recorded in [the B0 result report](docs/b0_results.md), and the FDI baseline in
 [the B1 result report](docs/b1_results.md). Joint cascade results are in
 [the B2/C1 report](docs/b2_c1_results.md), with the bottleneck analysis in
-[the B0 error report](docs/b0_error_analysis.md).
+[the B0 error report](docs/b0_error_analysis.md) and the rejected sampling
+experiment in [the B0-R1 report](docs/b0_r1_results.md).

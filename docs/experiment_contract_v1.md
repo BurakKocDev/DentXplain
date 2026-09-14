@@ -190,3 +190,13 @@ class-correct IoU50 detections, 371 false positives, and 187 false negatives.
 Periapical Lesion recall is 0.259, while Caries contributes 290 false positives.
 The next permitted experiment is a frozen-baseline B0 improvement ablation; it may
 not use the official 50-image final cohort for model or threshold selection.
+
+## B0-R1 ablation record
+
+The first B0 improvement candidate repeated rare-class training images once while
+holding the validation split and all other training settings fixed. It stopped at
+epoch 28 and selected epoch 18. AP50-95 fell from 0.369 to 0.355; Periapical
+Lesion remained effectively unchanged at 0.194, while Caries fell from 0.371 to
+0.306. B0-R1 is rejected and cannot replace the selected B0 checkpoint. See
+`docs/b0_r1_results.md`. A subsequent resolution ablation may use the original
+sampling only and must remain development-only.
