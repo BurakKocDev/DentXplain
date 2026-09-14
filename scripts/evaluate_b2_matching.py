@@ -7,7 +7,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from dentxplain.cascade import best_tooth_match, box_iou
+from dentxplain.cascade import anatomy_constrained_teeth, best_tooth_match, box_iou
 from dentxplain.data import load_annotations
 
 
@@ -16,6 +16,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--annotations", type=Path, required=True)
     parser.add_argument("--predictions", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--anatomy-constrained", action="store_true")
     return parser.parse_args()
 
 
@@ -86,6 +87,7 @@ def evaluate_configuration(
     b1_confidence: float,
     iou_weight: float,
     match_threshold: float,
+    anatomy_constrained: bool,
 ) -> dict[str, float | int]:
     total_ground_truth = 0
     b0_predictions = 0
@@ -103,6 +105,11 @@ def evaluate_configuration(
             if float(prediction["confidence"]) >= b0_confidence
         ]
         teeth = cached["b1"]["predictions"]
+        if anatomy_constrained:
+            teeth = anatomy_constrained_teeth(
+                teeth,
+                minimum_confidence=b1_confidence,
+            )
         pathology_matches = match_pathology_predictions(pathology, truths)
         b0_predictions += len(pathology)
         b0_true_positives += len(pathology_matches)
@@ -187,6 +194,7 @@ def main() -> int:
                 b1_confidence=b1_confidence,
                 iou_weight=iou_weight,
                 match_threshold=match_threshold,
+                anatomy_constrained=args.anatomy_constrained,
             )
         )
     grid.sort(
@@ -196,6 +204,7 @@ def main() -> int:
     report = {
         "schema_version": "1.0",
         "selection_rule": "maximum joint F1; ties by precision then recall",
+        "mode": "C1 anatomy-constrained" if args.anatomy_constrained else "B2 unconstrained",
         "cohort_image_count": cached["image_count"],
         "configuration_count": len(grid),
         "best": grid[0],
