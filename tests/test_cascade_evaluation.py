@@ -65,3 +65,19 @@ def test_fixed_cascade_counts_joint_correct_prediction() -> None:
 
     assert result["joint_correct_count"] == 1
     assert result["joint_f1"] == 1.0
+
+
+def test_cascade_handles_zero_target_image() -> None:
+    result = evaluate_cascade_configuration(
+        {"empty.png": {"b0": {"predictions": []}, "b1": {"predictions": []}}},
+        {"empty.png": []},
+        b0_confidence=0.2,
+        b1_confidence=0.1,
+        iou_weight=1.0,
+        match_threshold=0.5,
+        anatomy_constrained=False,
+    )
+
+    assert result["ground_truth_count"] == 0
+    assert result["b0_recall_at_iou50"] == 0.0
+    assert result["joint_f1"] == 0.0

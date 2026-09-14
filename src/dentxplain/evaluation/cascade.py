@@ -137,7 +137,9 @@ def evaluate_cascade_configuration(
         "b0_precision_at_iou50": (
             b0_true_positives / b0_predictions if b0_predictions else 0.0
         ),
-        "b0_recall_at_iou50": b0_true_positives / total_ground_truth,
+        "b0_recall_at_iou50": (
+            b0_true_positives / total_ground_truth if total_ground_truth else 0.0
+        ),
         "emitted_count": emitted,
         "abstained_prediction_count": b0_predictions - emitted,
         "emitted_pathology_true_positive_count": emitted_pathology_true_positives,

@@ -34,12 +34,43 @@ def main() -> int:
         )
         for name, parameters in config["configurations"].items()
     }
+    diagnosis_names = [str(category["name"]) for category in payload["categories_3"]]
+    by_diagnosis = {}
+    for method, parameters in config["configurations"].items():
+        by_diagnosis[method] = {}
+        for diagnosis in diagnosis_names:
+            sliced_images = {
+                file_name: {
+                    **content,
+                    "b0": {
+                        **content["b0"],
+                        "predictions": [
+                            prediction
+                            for prediction in content["b0"]["predictions"]
+                            if prediction["class_name"] == diagnosis
+                        ],
+                    },
+                }
+                for file_name, content in cached["images"].items()
+            }
+            sliced_ground_truth = {
+                file_name: [
+                    truth for truth in truths if truth["diagnosis"] == diagnosis
+                ]
+                for file_name, truths in ground_truth.items()
+            }
+            by_diagnosis[method][diagnosis] = evaluate_cascade_configuration(
+                sliced_images,
+                sliced_ground_truth,
+                **parameters,
+            )
     report = {
         "schema_version": "1.0",
         "evaluation_policy": "fixed pre-final configuration; no grid or retuning",
         "configuration": str(args.config),
         "cohort_image_count": cached["image_count"],
         "results": results,
+        "by_diagnosis": by_diagnosis,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
