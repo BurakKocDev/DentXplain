@@ -10,8 +10,8 @@ review status. It is not a diagnostic or treatment system.
 
 ## Current status
 
-**Phase 0 — data and license gate passed; B0 data preparation is complete.** No
-model training has started.
+**Phase 1 — the leakage-safe B0 diagnosis baseline is complete.** The B1 FDI
+tooth-enumeration data gate is next.
 
 - Official source and archive sizes recorded.
 - Validation annotation schema inspected.
@@ -20,6 +20,9 @@ model training has started.
 - The 705-image full-label pool is frozen as 564 training + 141 development
   validation images; the official 50-image cohort remains locked for final use.
 - B0 YOLO labels and image hard-links are prepared without duplicating image bytes.
+- The 960 px B0 run stopped at epoch 38 and selected epoch 28 on development
+  mAP50-95. It reached 0.545 mAP50 and 0.368 mAP50-95 without touching the locked
+  50-image final cohort.
 
 ## Dataset boundary
 
@@ -57,4 +60,5 @@ python scripts/train_b0.py `
 
 See [the data-gate record](docs/data_gate.md) for confirmed facts and risks, and
 [the experiment contract](docs/experiment_contract_v1.md) for the leakage-safe
-evaluation boundary and ordered model ladder.
+evaluation boundary and ordered model ladder. The complete B0 interpretation is
+recorded in [the B0 result report](docs/b0_results.md).

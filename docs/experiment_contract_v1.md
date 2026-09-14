@@ -122,3 +122,12 @@ The main B0 run uses 960 px, batch size 2, AMP, 40 maximum epochs, early stoppin
 and no mosaic/mixup/copy-paste. Square shuffled batches are preferred over
 Ultralytics rectangular mode because that mode disabled shuffling in the smoke
 run. The locked 50-image cohort remains untouched.
+
+## B0 main record
+
+The main run stopped at epoch 38 after ten epochs without development improvement
+and selected epoch 28. On the 141-image calibration-validation split it reached
+0.502 precision, 0.603 recall, 0.545 mAP50, and 0.368 mAP50-95. Impacted Tooth was
+strongest at 0.600 AP50-95; Periapical Lesion was weakest at 0.195. The locked
+50-image cohort remained untouched. See `docs/b0_results.md` for the complete
+class-wise result and interpretation.
