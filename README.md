@@ -86,6 +86,22 @@ python scripts/train_b1.py `
   --epochs 40 --image-size 960 --batch 2 --name b1_main_960
 ```
 
+## Local research demo
+
+The web interface runs the frozen B0+B1+C1 bundle, draws diagnosis boxes, assigns
+FDI numbers when the anatomical match clears the frozen threshold, and explicitly
+marks enumeration abstentions. Every response requires expert review.
+
+```powershell
+python -m pip install -e ".[service]"
+python -m uvicorn dentxplain.service.app:app --host 127.0.0.1 --port 8000
+```
+
+Open `http://127.0.0.1:8000/` for the visual demo or `/docs` for the API schema.
+The service expects the locally trained checkpoints at the paths recorded in
+`configs/evaluation/dentex_final_v1.json`; model weights and DENTEX data are not
+distributed by this repository.
+
 See [the data-gate record](docs/data_gate.md) for confirmed facts and risks, and
 [the experiment contract](docs/experiment_contract_v1.md) for the leakage-safe
 evaluation boundary and ordered model ladder. The complete B0 interpretation is

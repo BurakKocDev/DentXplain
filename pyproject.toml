@@ -19,13 +19,24 @@ audit = [
 train = [
   "ultralytics>=8.3,<9",
 ]
+service = [
+  "fastapi>=0.116,<1",
+  "python-multipart>=0.0.20,<1",
+  "uvicorn>=0.35,<1",
+  "Pillow>=10,<13",
+  "ultralytics>=8.3,<9",
+]
 dev = [
+  "httpx2>=2.12,<3",
   "pytest>=8,<10",
   "ruff>=0.12,<1",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"dentxplain.service" = ["static/*.html"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
