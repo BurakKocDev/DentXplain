@@ -10,8 +10,9 @@ review status. It is not a diagnostic or treatment system.
 
 ## Current status
 
-**Phase 3 — B0, B1, B2, and anatomy-constrained C1 development experiments are
-complete.** C1 is selected; B0 pathology errors are now the primary bottleneck.
+**Phase 4 — the locked B0/B1/B2/C1 evaluation is complete.** C1 retained its
+development advantage on the official 50-image cohort; packaging and demo work
+remain.
 
 - Official source and archive sizes recorded.
 - Validation annotation schema inspected.
@@ -41,6 +42,11 @@ complete.** C1 is selected; B0 pathology errors are now the primary bottleneck.
 - B0-R2 changed only global input resolution from 960 to 1280 px and was also
   rejected: AP50-95 reached 0.360 and Periapical Lesion fell to 0.181. Further
   development tuning is stopped; the selected B0+B1+C1 bundle is ready to freeze.
+- The pre-frozen C1 configuration reached 0.372 joint precision, 0.610 recall,
+  0.463 F1, and 0.957 conditional FDI accuracy on the official 50-image final
+  cohort. C1 reduced wrong FDI assignments from eight to five relative to B2.
+- Ten-thousand-image-level bootstrap resamples place C1 F1 at 0.385–0.534; the
+  paired C1−B2 interval includes zero, so superiority is not claimed.
 
 ## Dataset boundary
 
@@ -89,3 +95,6 @@ recorded in [the B0 result report](docs/b0_results.md), and the FDI baseline in
 [the B0 error report](docs/b0_error_analysis.md) and the rejected sampling
 experiment in [the B0-R1 report](docs/b0_r1_results.md). The resolution ablation
 is recorded in [the B0-R2 report](docs/b0_r2_results.md).
+The locked outcome and uncertainty analysis are in
+[the final result report](docs/final_results.md); intended use and limitations are
+summarized in [the model card](MODEL_CARD.md).

@@ -1,6 +1,6 @@
 # DentXplain experiment contract v1
 
-Status: **frozen; B0–C1 development ladder complete, final evaluation still locked.**
+Status: **complete; development ladder and single locked final evaluation finished.**
 
 ## Primary question
 
@@ -209,3 +209,13 @@ below B0's 0.369; Periapical Lesion fell from 0.195 to 0.181. B0-R2 is rejected.
 After two unsuccessful, pre-specified ablations, development tuning stops. The
 original B0 epoch-28 checkpoint, B1 epoch-6 checkpoint, and C1 maximum-F1
 thresholds are frozen for a single evaluation on the official 50-image cohort.
+
+## Locked final record
+
+The configuration was committed before inference (`9c87e8c`). On 50 images and
+182 targets, fixed B2 reached 0.368 joint precision, 0.599 recall, and 0.456 F1.
+Fixed C1 reached 0.372 precision, 0.610 recall, and 0.463 F1; conditional FDI
+accuracy rose from 0.932 to 0.957 and wrong FDI assignments fell from eight to
+five. In 10,000 paired image-bootstrap resamples, the C1−B2 joint-F1 95% interval
+was -0.019 to 0.032. The point estimate supports the development finding, but the
+interval includes zero and superiority is not claimed. See `docs/final_results.md`.
