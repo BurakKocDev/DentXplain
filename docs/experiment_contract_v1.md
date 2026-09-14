@@ -147,3 +147,12 @@ confirmed that boxes follow the upper/lower tooth rows and the YAML loader maps
 class IDs 0–31 to FDI 11–48 correctly. Horizontal flipping is disabled because it
 would invalidate left/right FDI quadrants. The near-zero one-epoch AP is only a
 pipeline check and is not a selected model result.
+
+## B1 main record
+
+The B1 main run stopped at epoch 16 and selected epoch 6. Across 32 FDI classes on
+the 124-image development-validation split it reached 0.911 precision, 0.930
+recall, 0.951 mAP50, and 0.545 mAP50-95. The confusion matrix was strongly
+diagonal; visual errors concentrated around adjacent positions and terminal
+molars. The locked final cohort remained untouched. See `docs/b1_results.md` for
+the complete interpretation and checkpoint identity.

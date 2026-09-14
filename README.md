@@ -10,8 +10,8 @@ review status. It is not a diagnostic or treatment system.
 
 ## Current status
 
-**Phase 2 — B0 is complete and the leakage-safe B1 FDI dataset/smoke run are
-complete.** The B1 main tooth-enumeration run is next.
+**Phase 2 — B0 diagnosis and B1 FDI tooth-enumeration baselines are complete.**
+The B2 unconstrained box-matching cascade is next.
 
 - Official source and archive sizes recorded.
 - Validation annotation schema inspected.
@@ -26,6 +26,8 @@ complete.** The B1 main tooth-enumeration run is next.
 - The B1 pool excludes all 18 enumeration images that exactly overlap the final
   cohort. Its SHA-grouped split contains 492 training and 124 development-validation
   images with all 32 permanent-tooth FDI classes represented.
+- The selected B1 checkpoint reached 0.951 mAP50 and 0.545 mAP50-95 across all
+  32 FDI classes on development validation.
 
 ## Dataset boundary
 
@@ -68,4 +70,5 @@ python scripts/train_b1.py `
 See [the data-gate record](docs/data_gate.md) for confirmed facts and risks, and
 [the experiment contract](docs/experiment_contract_v1.md) for the leakage-safe
 evaluation boundary and ordered model ladder. The complete B0 interpretation is
-recorded in [the B0 result report](docs/b0_results.md).
+recorded in [the B0 result report](docs/b0_results.md), and the FDI baseline in
+[the B1 result report](docs/b1_results.md).
