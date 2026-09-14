@@ -109,6 +109,12 @@ For B1, 18 enumeration images that are byte-identical to locked-final images are
 excluded before fitting. The nine internal exact-duplicate groups in the remaining
 enumeration pool must be grouped on a single side of its development split.
 
+The frozen B1 manifest satisfies this rule: 616 eligible images are divided into
+492 training and 124 calibration-validation images, containing 13,878 and 3,702
+tooth boxes respectively. All 32 FDI classes occur on both sides. Its manifest
+SHA-256 is
+`02f84e0c85455c9e1db570b1cdb9533808da024ffa816ab4d871a6b8084be0fb`.
+
 ## B0 smoke record
 
 The 640 px, one-epoch smoke run completed on the RTX 3050 Ti with CUDA 12.6. It
@@ -131,3 +137,13 @@ and selected epoch 28. On the 141-image calibration-validation split it reached
 strongest at 0.600 AP50-95; Periapical Lesion was weakest at 0.195. The locked
 50-image cohort remained untouched. See `docs/b0_results.md` for the complete
 class-wise result and interpretation.
+
+## B1 smoke record
+
+The 640 px, one-epoch B1 smoke run completed on the same GPU with all 492 training
+and 124 calibration-validation images. It loaded 32 FDI classes and 17,580 boxes
+without corrupt images, backgrounds, or duplicate source labels. Visual review
+confirmed that boxes follow the upper/lower tooth rows and the YAML loader maps
+class IDs 0–31 to FDI 11–48 correctly. Horizontal flipping is disabled because it
+would invalidate left/right FDI quadrants. The near-zero one-epoch AP is only a
+pipeline check and is not a selected model result.
