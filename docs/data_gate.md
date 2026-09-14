@@ -58,6 +58,28 @@ were not downloaded.
   `çekim`, `gömülü`, `lezyon`, and `kırık`. No unverified collapse of these labels
   into the four benchmark diagnoses is allowed.
 
+## Local training archive and duplicate audit
+
+- `training_data.zip` downloaded at exactly 10,927,391,529 bytes. Its local file
+  SHA-256 is `18b2a2dbc5a2b10b0cc6a7677c46a382f4709ab8c9c3bb94f57b74e38e11ffd3`.
+- The local central directory matches the remote index: 3,615 entries, 3,603 PNG,
+  three JSON, and 14,725,611,903 total uncompressed bytes. The Hugging Face Xet
+  object ID is recorded separately and is not treated as the file SHA-256.
+- Only the 705-image full-label and 634-image enumeration directories were
+  extracted. Both have complete image/annotation pairing and no corrupt or
+  dimension-mismatched images.
+- The full-label pool has no internal exact duplicates and no exact duplicate in
+  the locked 50-image final cohort.
+- Source annotations 2335 and 2337 are semantically identical Caries labels for
+  `train_377.png`. The conversion keeps the source untouched, records the issue,
+  and emits one deterministic YOLO label instead of double-counting it.
+- The enumeration pool has nine internal exact-duplicate groups. In addition, 18
+  enumeration images are exact copies of locked-final images under different file
+  names. These 18 records are excluded from all B1 fitting; internal duplicate
+  groups must remain on one side of any B1 split.
+- Perceptual hashing is used only to nominate review candidates; it never silently
+  merges or removes clinically similar panoramics.
+
 ## Forty-image visual review
 
 The deterministic contact sheet at
@@ -99,21 +121,19 @@ from this code repository.
 - [x] Validation ZIP integrity and image/annotation pairing confirmed
 - [x] At least 40 validation examples visually reviewed
 - [x] Full training/test archive trees and annotation levels confirmed remotely
-- [ ] Duplicate and near-duplicate policy defined
+- [x] Duplicate and near-duplicate policy defined
 - [x] Frozen development/test protocol defined without test leakage
 - [x] Disk and GPU budget approved
 
 ## Download decision
 
-Validation integrity and visual audit passed. The 10.9 GB training archive may be
-downloaded only with a deliberate disk plan: its indexed uncompressed size is
-14.73 GB, so keeping both compressed and expanded copies would consume about
-25.65 GB before caches, manifests, and model artifacts. The selected plan keeps
-the compressed archive temporarily and extracts only the 705-image full-label
-directory (~2.69 GB) plus the 634-image enumeration directory (~2.15 GB). At the
-start of the download the C: drive had 36.08 GiB free.
+Validation integrity and visual audit passed. The 10.9 GB training archive was
+downloaded and verified. The selected plan keeps the compressed archive
+temporarily and extracts only the 705-image full-label directory (~2.69 GB) plus
+the 634-image enumeration directory (~2.15 GB), avoiding the full 14.73 GB
+expansion. After selective extraction, approximately 19 GiB remained free.
 
-The available NVIDIA GeForce RTX 3050 Ti Laptop GPU has 4 GiB VRAM. B0 therefore
-starts at 640 px with automatic mixed precision, then uses a 960/1,024 px
-rectangular main run with batch size 1 and gradient accumulation. A 1,280 px run
-is not part of the default plan.
+The available NVIDIA GeForce RTX 3050 Ti Laptop GPU has 4 GiB VRAM. B0 starts at
+640 px with automatic mixed precision. After the smoke run used less than 0.5 GiB
+reported GPU memory, the main run was set to shuffled 960 px square batches of two.
+A 1,280 px run is not part of the default plan.

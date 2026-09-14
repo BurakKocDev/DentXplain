@@ -11,6 +11,10 @@
     "validation_data.zip": 149512256,
     "test_data.zip": 764834414
   },
+  "archive_sha256": {
+    "training_data.zip": "18b2a2dbc5a2b10b0cc6a7677c46a382f4709ab8c9c3bb94f57b74e38e11ffd3",
+    "validation_data.zip": "6370bb4f1024bd610cde13242a465cb2eff195fc02f56ac22126555e7edc7bc3"
+  },
   "expected_subsets": {
     "quadrant_only": 693,
     "quadrant_enumeration": 634,

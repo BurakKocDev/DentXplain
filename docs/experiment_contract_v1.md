@@ -12,10 +12,13 @@ an unconstrained cascade?
 
 - The 50-image `validation_triple.json` cohort is the locked final evaluation set.
   It is not used for fitting, early stopping, threshold selection, or calibration.
-- The 705 fully annotated training images form the development pool. A deterministic
-  duplicate-aware split will be frozen only after image hashes are available.
-- Target development ratio is approximately 80/20 train/calibration-validation,
-  stratified by diagnosis presence and grouped by exact/near-duplicate identity.
+- The 705 fully annotated training images form the development pool. The frozen
+  split contains 564 training and 141 calibration-validation images, stratified
+  by multi-label diagnosis-presence signature with seed `20260913`.
+- The local split manifest SHA-256 is
+  `eccefd126f454dedb2dfcca3992820fbc01a1db290f85d7d440bbefdb8d40462`.
+  The full-label pool has no internal exact duplicate and no exact overlap with
+  the locked final cohort.
 - The public 250-image test archive is secondary/exploratory because its LabelMe
   ontology does not directly match the four-class COCO training schema. It cannot
   affect the primary result until an owner-supported mapping is documented.
@@ -38,8 +41,8 @@ an unconstrained cascade?
 
 - YOLOv8s, four diagnosis classes, trained only on the 705-image full development
   pool after its split is frozen.
-- A 640 px one-epoch smoke run precedes a 960/1,024 px rectangular main run using
-  automatic mixed precision, batch size 1, and gradient accumulation on 4 GiB VRAM.
+- A 640 px one-epoch smoke run precedes a shuffled 960 px main run using automatic
+  mixed precision and batch size 2 on 4 GiB VRAM.
 - Purpose: establish localization and diagnosis difficulty with minimal engineering.
 
 ### B1 — FDI tooth detector
@@ -101,3 +104,21 @@ Training may start only when:
 
 The project advances from B0 to B1 only if B0 runs end-to-end and reports all four
 classes without using the locked 50-image evaluation cohort for selection.
+
+For B1, 18 enumeration images that are byte-identical to locked-final images are
+excluded before fitting. The nine internal exact-duplicate groups in the remaining
+enumeration pool must be grouped on a single side of its development split.
+
+## B0 smoke record
+
+The 640 px, one-epoch smoke run completed on the RTX 3050 Ti with CUDA 12.6. It
+processed 564 training and 141 calibration-validation images, reported all four
+classes, produced loader/label visualizations, and used less than 0.5 GiB reported
+GPU memory. Its mAP50 of approximately 0.02 is a pipeline check, not a performance
+claim or a selected checkpoint. Visual review found the transformed boxes aligned
+with the intended panoramic regions.
+
+The main B0 run uses 960 px, batch size 2, AMP, 40 maximum epochs, early stopping,
+and no mosaic/mixup/copy-paste. Square shuffled batches are preferred over
+Ultralytics rectangular mode because that mode disabled shuffling in the smoke
+run. The locked 50-image cohort remains untouched.

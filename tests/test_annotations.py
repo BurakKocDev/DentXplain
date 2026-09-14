@@ -88,3 +88,30 @@ def test_zero_annotation_images_are_included_in_density_statistics() -> None:
         "maximum": 1,
         "mean": 0.5,
     }
+
+
+def test_partial_enumeration_schema_does_not_require_diagnosis() -> None:
+    payload = valid_payload()
+    payload.pop("categories_3")
+    payload["annotations"][0].pop("category_id_3")
+
+    report = audit_annotations(payload)
+
+    assert report["category_schema_matches"] == {
+        "categories_1": True,
+        "categories_2": True,
+    }
+    assert report["category_counts"]["fdi"] == {"48": 1}
+    assert report["category_counts"]["diagnosis"] == {}
+
+
+def test_reports_semantically_duplicate_annotations_with_distinct_ids() -> None:
+    payload = valid_payload()
+    duplicate = dict(payload["annotations"][0])
+    duplicate["id"] = 11
+    payload["annotations"].append(duplicate)
+
+    report = audit_annotations(payload)
+
+    assert report["duplicate_annotation_id_count"] == 0
+    assert report["exact_duplicate_annotation_groups"] == [[10, 11]]

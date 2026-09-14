@@ -10,14 +10,16 @@ review status. It is not a diagnostic or treatment system.
 
 ## Current status
 
-**Phase 0 — data and license gate is in progress.** No model training has started.
+**Phase 0 — data and license gate passed; B0 data preparation is complete.** No
+model training has started.
 
 - Official source and archive sizes recorded.
 - Validation annotation schema inspected.
 - Validation image archive downloaded locally for integrity and visual review.
-- Full training/test archive structures and label schemas inspected remotely.
-- The experiment contract is frozen; the resumable training archive download is
-  the next data-preparation step.
+- Training archive downloaded, verified, and selectively extracted.
+- The 705-image full-label pool is frozen as 564 training + 141 development
+  validation images; the official 50-image cohort remains locked for final use.
+- B0 YOLO labels and image hard-links are prepared without duplicating image bytes.
 
 ## Dataset boundary
 
@@ -44,6 +46,13 @@ python scripts/audit_validation.py `
   --images data/raw/validation_data/validation_data/quadrant_enumeration_disease/xrays `
   --output artifacts/data_audit/validation_audit.json
 python -m pytest -q
+python scripts/train_b0.py `
+  --data data/processed/b0_yolo/dentex_b0.yaml `
+  --epochs 1 --image-size 640 --batch 1 --name b0_smoke_640
+
+python scripts/train_b0.py `
+  --data data/processed/b0_yolo/dentex_b0.yaml `
+  --epochs 40 --image-size 960 --batch 2 --name b0_main_960
 ```
 
 See [the data-gate record](docs/data_gate.md) for confirmed facts and risks, and

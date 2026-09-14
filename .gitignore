@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+.ultralytics/
 build/
 dist/
 *.egg-info/
@@ -21,4 +22,3 @@ runs/
 .env
 .env.*
 !.env.example
-

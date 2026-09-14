@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -39,8 +39,12 @@ def audit_annotations(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Annotation payload must contain images and annotations lists")
 
     category_maps = {
-        key: _category_map(payload, key) for key in EXPECTED_CATEGORY_NAMES
+        key: _category_map(payload, key)
+        for key in EXPECTED_CATEGORY_NAMES
+        if key in payload
     }
+    if not category_maps:
+        raise ValueError("Annotation payload must contain at least one category list")
     category_schema_matches = {
         key: list(mapping.values()) == EXPECTED_CATEGORY_NAMES[key]
         for key, mapping in category_maps.items()
@@ -59,22 +63,51 @@ def audit_annotations(payload: dict[str, Any]) -> dict[str, Any]:
     orphan_annotation_ids: list[int] = []
     invalid_bbox_ids: list[int] = []
     out_of_bounds_bbox_ids: list[int] = []
+    annotation_identity: defaultdict[tuple, list[int]] = defaultdict(list)
 
     for annotation in annotations:
         annotation_id = int(annotation["id"])
         image_id = int(annotation["image_id"])
+        identity = (
+            image_id,
+            annotation.get("category_id_1"),
+            annotation.get("category_id_2"),
+            annotation.get("category_id_3"),
+            tuple(annotation.get("bbox", [])),
+            tuple(tuple(polygon) for polygon in annotation.get("segmentation", [])),
+        )
+        annotation_identity[identity].append(annotation_id)
         annotations_per_image[image_id] += 1
         image = image_by_id.get(image_id)
         if image is None:
             orphan_annotation_ids.append(annotation_id)
 
-        quadrant = category_maps["categories_1"].get(int(annotation["category_id_1"]))
-        tooth = category_maps["categories_2"].get(int(annotation["category_id_2"]))
-        diagnosis = category_maps["categories_3"].get(int(annotation["category_id_3"]))
-        category_counts["quadrant"][quadrant or "UNKNOWN"] += 1
-        category_counts["tooth_position"][tooth or "UNKNOWN"] += 1
-        category_counts["diagnosis"][diagnosis or "UNKNOWN"] += 1
-        category_counts["fdi"][f"{quadrant}{tooth}"] += 1
+        quadrant_map = category_maps.get("categories_1")
+        tooth_map = category_maps.get("categories_2")
+        diagnosis_map = category_maps.get("categories_3")
+        quadrant = (
+            quadrant_map.get(int(annotation["category_id_1"]))
+            if quadrant_map is not None and "category_id_1" in annotation
+            else None
+        )
+        tooth = (
+            tooth_map.get(int(annotation["category_id_2"]))
+            if tooth_map is not None and "category_id_2" in annotation
+            else None
+        )
+        diagnosis = (
+            diagnosis_map.get(int(annotation["category_id_3"]))
+            if diagnosis_map is not None and "category_id_3" in annotation
+            else None
+        )
+        if quadrant_map is not None:
+            category_counts["quadrant"][quadrant or "UNKNOWN"] += 1
+        if tooth_map is not None:
+            category_counts["tooth_position"][tooth or "UNKNOWN"] += 1
+        if diagnosis_map is not None:
+            category_counts["diagnosis"][diagnosis or "UNKNOWN"] += 1
+        if quadrant is not None and tooth is not None:
+            category_counts["fdi"][f"{quadrant}{tooth}"] += 1
 
         bbox = annotation.get("bbox")
         if not isinstance(bbox, list) or len(bbox) != 4:
@@ -100,6 +133,9 @@ def audit_annotations(payload: dict[str, Any]) -> dict[str, Any]:
         "images_without_annotations": images_without_annotations,
         "duplicate_image_id_count": len(image_ids) - len(set(image_ids)),
         "duplicate_annotation_id_count": len(annotation_ids) - len(set(annotation_ids)),
+        "exact_duplicate_annotation_groups": sorted(
+            sorted(ids) for ids in annotation_identity.values() if len(ids) > 1
+        ),
         "orphan_annotation_ids": sorted(orphan_annotation_ids),
         "invalid_bbox_ids": sorted(invalid_bbox_ids),
         "out_of_bounds_bbox_ids": sorted(out_of_bounds_bbox_ids),
