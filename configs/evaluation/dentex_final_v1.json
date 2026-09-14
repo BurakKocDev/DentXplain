@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "status": "frozen_before_final_inference",
+  "image_size": 960,
+  "minimum_cached_confidence": 0.05,
+  "expected_image_count": 50,
+  "annotation_sha256": "d058afd35d2849923c7c045e61fd3e05d231dcf74d55009993fff88bd9b6f5a2",
+  "models": {
+    "b0": {
+      "path": "artifacts/training/b0_main_960/weights/best.pt",
+      "sha256": "cab3d3e5aafb960e9ddef8a6c38c6999082fdfea69f5008826fa47a94404c87f"
+    },
+    "b1": {
+      "path": "artifacts/training/b1_main_960/weights/best.pt",
+      "sha256": "0f6faf5b200b8b02ce47a33433dcae1155b02af0c1774a481c199ccbfa68113d"
+    }
+  },
+  "configurations": {
+    "b2": {
+      "b0_confidence": 0.2,
+      "b1_confidence": 0.25,
+      "iou_weight": 1.0,
+      "match_threshold": 0.6,
+      "anatomy_constrained": false
+    },
+    "c1": {
+      "b0_confidence": 0.2,
+      "b1_confidence": 0.1,
+      "iou_weight": 0.25,
+      "match_threshold": 0.7,
+      "anatomy_constrained": true
+    }
+  },
+  "selection_policy": "all models and thresholds selected on development data; no final-set tuning"
+}

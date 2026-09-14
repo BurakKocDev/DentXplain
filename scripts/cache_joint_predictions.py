@@ -11,6 +11,7 @@ from typing import Any
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Cache B0 and B1 predictions for B2")
     parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument("--manifest-key", default="joint_development")
     parser.add_argument("--images", type=Path, required=True)
     parser.add_argument("--b0-weights", type=Path, required=True)
     parser.add_argument("--b1-weights", type=Path, required=True)
@@ -70,11 +71,11 @@ def main() -> int:
     project_root = Path(__file__).resolve().parents[1]
     os.environ.setdefault("YOLO_CONFIG_DIR", str(project_root / ".ultralytics"))
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    file_names = list(manifest["joint_development"])
+    file_names = list(manifest[args.manifest_key])
     sources = [str((args.images / file_name).resolve()) for file_name in file_names]
     missing = [source for source in sources if not Path(source).is_file()]
     if missing:
-        raise FileNotFoundError(f"Missing {len(missing)} joint-development images")
+        raise FileNotFoundError(f"Missing {len(missing)} manifest images")
 
     from ultralytics import YOLO
 
@@ -82,11 +83,12 @@ def main() -> int:
     b0_predictions = predict(YOLO(args.b0_weights), sources, args)
     b1_predictions = predict(YOLO(args.b1_weights), sources, args)
     if set(b0_predictions) != set(file_names) or set(b1_predictions) != set(file_names):
-        raise RuntimeError("Prediction output does not cover the joint manifest")
+        raise RuntimeError("Prediction output does not cover the requested manifest")
 
     payload = {
         "schema_version": "1.0",
         "cohort_manifest": str(args.manifest),
+        "cohort_manifest_key": args.manifest_key,
         "image_count": len(file_names),
         "image_size": args.image_size,
         "minimum_cached_confidence": args.confidence,
