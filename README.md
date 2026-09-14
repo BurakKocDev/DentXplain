@@ -28,6 +28,8 @@ The B2 unconstrained box-matching cascade is next.
   images with all 32 permanent-tooth FDI classes represented.
 - The selected B1 checkpoint reached 0.951 mAP50 and 0.545 mAP50-95 across all
   32 FDI classes on development validation.
+- A 100-image joint development cohort unseen by both model training sets is
+  frozen for B2 matching and abstention thresholds.
 
 ## Dataset boundary
 

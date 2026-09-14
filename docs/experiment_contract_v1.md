@@ -57,6 +57,9 @@ an unconstrained cascade?
 - Match B0 abnormal-tooth boxes to B1 tooth boxes by overlap and center distance.
 - Emit diagnosis + FDI only when a match clears a development-derived threshold;
   otherwise abstain from enumeration.
+- Tune matching and abstention only on the frozen joint development cohort that
+  is unseen by both B0 and B1; do not use either model's full independent
+  validation split for the combined score.
 - Purpose: fair baseline for anatomical post-processing.
 
 ### C1 — anatomy-constrained DentXplain
@@ -156,3 +159,17 @@ recall, 0.951 mAP50, and 0.545 mAP50-95. The confusion matrix was strongly
 diagonal; visual errors concentrated around adjacent positions and terminal
 molars. The locked final cohort remained untouched. See `docs/b1_results.md` for
 the complete interpretation and checkpoint identity.
+
+## Joint B2/C1 development boundary
+
+The independently valid B0 and B1 splits cannot be combined naively: 41 of the
+141 B0 calibration-validation images are exact encoded-image matches to B1
+training images under different file names. Those images remain valid for B0-only
+evaluation but are excluded from every combined B2/C1 development score.
+
+The frozen joint cohort contains the remaining 100 B0 calibration-validation
+images and has no exact overlap with either model's training examples. Fifteen of
+the 100 are also in B1 calibration-validation, which is allowed because B1 did not
+fit them. The joint manifest SHA-256 is
+`f0f0844afe32bf739b317ebecf5fad7e625371edfe7addb03031ffba5db66491`.
+The locked 50-image final cohort remains untouched.

@@ -58,3 +58,8 @@ box to at most one B1 tooth box using IoU plus normalized center distance. B2 ma
 abstain when no tooth clears a development-derived threshold. C1 will later apply
 FDI order and one-to-one constraints to the same detector outputs so the value of
 anatomical reasoning is measured without retraining either detector.
+
+The common development audit found 41 B0 validation images that B1 had seen under
+different names during training. They are excluded from combined evaluation. The
+resulting 100-image joint cohort is exact-image clean against both training sets
+and is the only cohort permitted for B2/C1 threshold development.
