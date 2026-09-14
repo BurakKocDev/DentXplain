@@ -200,3 +200,12 @@ Lesion remained effectively unchanged at 0.194, while Caries fell from 0.371 to
 0.306. B0-R1 is rejected and cannot replace the selected B0 checkpoint. See
 `docs/b0_r1_results.md`. A subsequent resolution ablation may use the original
 sampling only and must remain development-only.
+
+## B0-R2 ablation record
+
+B0-R2 kept the original sampling and changed only input resolution from 960 to
+1280 px. It completed 40 epochs and selected epoch 31. AP50-95 reached 0.360,
+below B0's 0.369; Periapical Lesion fell from 0.195 to 0.181. B0-R2 is rejected.
+After two unsuccessful, pre-specified ablations, development tuning stops. The
+original B0 epoch-28 checkpoint, B1 epoch-6 checkpoint, and C1 maximum-F1
+thresholds are frozen for a single evaluation on the official 50-image cohort.

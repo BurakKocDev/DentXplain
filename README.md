@@ -38,6 +38,9 @@ complete.** C1 is selected; B0 pathology errors are now the primary bottleneck.
 - B0-R1 whole-image rare-class resampling was tested and rejected: AP50-95 fell
   from 0.369 to 0.355 and Periapical Lesion did not improve. The original B0
   checkpoint remains selected.
+- B0-R2 changed only global input resolution from 960 to 1280 px and was also
+  rejected: AP50-95 reached 0.360 and Periapical Lesion fell to 0.181. Further
+  development tuning is stopped; the selected B0+B1+C1 bundle is ready to freeze.
 
 ## Dataset boundary
 
@@ -84,4 +87,5 @@ recorded in [the B0 result report](docs/b0_results.md), and the FDI baseline in
 [the B1 result report](docs/b1_results.md). Joint cascade results are in
 [the B2/C1 report](docs/b2_c1_results.md), with the bottleneck analysis in
 [the B0 error report](docs/b0_error_analysis.md) and the rejected sampling
-experiment in [the B0-R1 report](docs/b0_r1_results.md).
+experiment in [the B0-R1 report](docs/b0_r1_results.md). The resolution ablation
+is recorded in [the B0-R2 report](docs/b0_r2_results.md).
