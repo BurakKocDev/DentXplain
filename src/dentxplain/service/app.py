@@ -17,7 +17,7 @@ DISCLAIMER = "Research prototype only; not for diagnosis or treatment decisions.
 
 app = FastAPI(
     title="DentXplain API",
-    version="0.1.0",
+    version="0.1.1",
     description="Anatomy-constrained panoramic dental X-ray research API.",
 )
 
