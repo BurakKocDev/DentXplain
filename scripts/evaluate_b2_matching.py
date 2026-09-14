@@ -95,7 +95,7 @@ def evaluate_configuration(
     emitted_pathology_true_positives = 0
 
     for file_name, cached in cached_images.items():
-        truths = ground_truth[file_name]
+        truths = ground_truth.get(file_name, [])
         total_ground_truth += len(truths)
         pathology = [
             prediction
@@ -139,16 +139,28 @@ def evaluate_configuration(
         "ground_truth_count": total_ground_truth,
         "b0_prediction_count": b0_predictions,
         "b0_true_positive_count": b0_true_positives,
+        "b0_precision_at_iou50": (
+            b0_true_positives / b0_predictions if b0_predictions else 0.0
+        ),
         "b0_recall_at_iou50": b0_true_positives / total_ground_truth,
         "emitted_count": emitted,
+        "abstained_prediction_count": b0_predictions - emitted,
         "emitted_pathology_true_positive_count": emitted_pathology_true_positives,
         "joint_correct_count": joint_correct,
+        "wrong_fdi_on_emitted_pathology_tp": (
+            emitted_pathology_true_positives - joint_correct
+        ),
         "joint_precision": joint_precision,
         "joint_recall": joint_recall,
         "joint_f1": joint_f1,
         "fdi_accuracy_on_emitted_pathology_tp": (
             joint_correct / emitted_pathology_true_positives
             if emitted_pathology_true_positives
+            else 0.0
+        ),
+        "assignment_coverage_on_pathology_tp": (
+            emitted_pathology_true_positives / b0_true_positives
+            if b0_true_positives
             else 0.0
         ),
     }
@@ -188,6 +200,7 @@ def main() -> int:
         "configuration_count": len(grid),
         "best": grid[0],
         "top_20": grid[:20],
+        "configurations": grid,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
