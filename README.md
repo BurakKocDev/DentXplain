@@ -10,8 +10,8 @@ review status. It is not a diagnostic or treatment system.
 
 ## Current status
 
-**Phase 2 — B0 diagnosis and B1 FDI tooth-enumeration baselines are complete.**
-The B2 unconstrained box-matching cascade is next.
+**Phase 3 — B0, B1, B2, and anatomy-constrained C1 development experiments are
+complete.** C1 is selected; B0 pathology errors are now the primary bottleneck.
 
 - Official source and archive sizes recorded.
 - Validation annotation schema inspected.
@@ -30,6 +30,11 @@ The B2 unconstrained box-matching cascade is next.
   32 FDI classes on development validation.
 - A 100-image joint development cohort unseen by both model training sets is
   frozen for B2 matching and abstention thresholds.
+- On that cohort, B2 reached 0.502 joint F1 and C1 reached 0.510 while increasing
+  correct diagnosis+FDI results from 313 to 320. The official final cohort remains
+  untouched.
+- Thresholded B0 error analysis confirms Periapical Lesion recall (0.259) and
+  Caries false positives (290) as the priorities for the next controlled ablation.
 
 ## Dataset boundary
 
@@ -73,4 +78,6 @@ See [the data-gate record](docs/data_gate.md) for confirmed facts and risks, and
 [the experiment contract](docs/experiment_contract_v1.md) for the leakage-safe
 evaluation boundary and ordered model ladder. The complete B0 interpretation is
 recorded in [the B0 result report](docs/b0_results.md), and the FDI baseline in
-[the B1 result report](docs/b1_results.md).
+[the B1 result report](docs/b1_results.md). Joint cascade results are in
+[the B2/C1 report](docs/b2_c1_results.md), with the bottleneck analysis in
+[the B0 error report](docs/b0_error_analysis.md).

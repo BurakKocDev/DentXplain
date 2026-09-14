@@ -1,6 +1,6 @@
 # DentXplain experiment contract v1
 
-Status: **frozen for data preparation; model training remains gated.**
+Status: **frozen; B0–C1 development ladder complete, final evaluation still locked.**
 
 ## Primary question
 
@@ -173,3 +173,20 @@ the 100 are also in B1 calibration-validation, which is allowed because B1 did n
 fit them. The joint manifest SHA-256 is
 `f0f0844afe32bf739b317ebecf5fad7e625371edfe7addb03031ffba5db66491`.
 The locked 50-image final cohort remains untouched.
+
+## B2/C1 development record
+
+B0 and B1 predictions were cached once for the frozen 100-image joint cohort, so
+B2 and C1 use identical detector outputs. A 525-configuration development grid
+selected thresholds by maximum joint F1. B2 reached 0.443 precision, 0.580 recall,
+and 0.502 joint F1 with 0.918 conditional FDI accuracy. C1's monotonic upper/lower
+arch sequence reached 0.448 precision, 0.593 recall, and 0.510 joint F1 with 0.917
+conditional FDI accuracy. Correct diagnosis+FDI assignments increased from 313 to
+320 of 540 targets. C1 is therefore selected for the final comparison; see
+`docs/b2_c1_results.md`.
+
+At C1's selected B0 confidence threshold, the clean joint cohort contains 353
+class-correct IoU50 detections, 371 false positives, and 187 false negatives.
+Periapical Lesion recall is 0.259, while Caries contributes 290 false positives.
+The next permitted experiment is a frozen-baseline B0 improvement ablation; it may
+not use the official 50-image final cohort for model or threshold selection.
