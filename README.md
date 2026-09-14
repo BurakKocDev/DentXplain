@@ -1,7 +1,7 @@
 # DentXplain
 
 DentXplain is a research prototype for hierarchical analysis of panoramic dental
-X-rays. The project will compare a flat detector with a quadrant → tooth → FDI →
+X-rays. The project compares a flat detector with a quadrant → tooth → FDI →
 diagnosis pipeline on the DENTEX benchmark.
 
 The intended output is an auditable research result: each abnormal-tooth box is
@@ -10,9 +10,9 @@ review status. It is not a diagnostic or treatment system.
 
 ## Current status
 
-**Phase 4 — the locked B0/B1/B2/C1 evaluation is complete.** C1 retained its
-development advantage on the official 50-image cohort; packaging and demo work
-remain.
+**Phase 5 — the locked evaluation and local research demo are complete.** C1
+retained its development advantage on the official 50-image cohort. Only release
+packaging and repository publication remain.
 
 - Official source and archive sizes recorded.
 - Validation annotation schema inspected.
@@ -47,6 +47,10 @@ remain.
   cohort. C1 reduced wrong FDI assignments from eight to five relative to B2.
 - Ten-thousand-image-level bootstrap resamples place C1 F1 at 0.385–0.534; the
   paired C1−B2 interval includes zero, so superiority is not claimed.
+- A FastAPI service and responsive browser interface now run the frozen bundle,
+  provide annotated PNG output, separate pathology confidence from FDI matching,
+  group related same-tooth candidates, and keep low-confidence candidates visible
+  behind an explicit review control.
 
 ## Dataset boundary
 
@@ -55,7 +59,7 @@ labels it `CC BY-NC-SA 4.0`; therefore data and derived data are handled as
 non-commercial research material and kept outside Git. The repository code is
 planned to use the MIT license independently.
 
-## Planned experiment
+## Experiment design
 
 1. Establish a simple fully-annotated flat detector baseline.
 2. Add quadrant and enumeration supervision without treating missing diagnosis
@@ -90,7 +94,10 @@ python scripts/train_b1.py `
 
 The web interface runs the frozen B0+B1+C1 bundle, draws diagnosis boxes, assigns
 FDI numbers when the anatomical match clears the frozen threshold, and explicitly
-marks enumeration abstentions. Every response requires expert review.
+marks enumeration abstentions. The presentation layer groups related Caries and
+Deep Caries candidates on the same FDI tooth and defaults the annotated image to
+medium/high-priority findings; raw API findings remain unchanged and low-priority
+findings can still be reviewed. Every response requires expert review.
 
 ```powershell
 python -m pip install -e ".[service]"
