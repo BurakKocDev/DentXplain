@@ -1,5 +1,10 @@
 # DentXplain
 
+[![CI](https://github.com/BurakKocDev/DentXplain/actions/workflows/ci.yml/badge.svg)](https://github.com/BurakKocDev/DentXplain/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/badge/CodeQL-enabled-2ea44f?logo=github)](https://github.com/BurakKocDev/DentXplain/security/code-scanning)
+[![Release](https://img.shields.io/github/v/release/BurakKocDev/DentXplain)](https://github.com/BurakKocDev/DentXplain/releases/latest)
+[![License: MIT](https://img.shields.io/badge/Code_License-MIT-blue.svg)](LICENSE)
+
 DentXplain is a research prototype for hierarchical analysis of panoramic dental
 X-rays. The project compares a flat detector with a quadrant → tooth → FDI →
 diagnosis pipeline on the DENTEX benchmark.
