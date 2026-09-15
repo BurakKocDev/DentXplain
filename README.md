@@ -10,9 +10,9 @@ review status. It is not a diagnostic or treatment system.
 
 ## Current status
 
-**Phase 5 — the locked evaluation and local research demo are complete.** C1
-retained its development advantage on the official 50-image cohort. Only release
-packaging and repository publication remain.
+**Phase 5 — the locked evaluation, research demo, and public repository are
+complete.** C1 retained its development advantage on the official 50-image
+cohort. The selected research bundle is frozen for reproducible release packaging.
 
 - Official source and archive sizes recorded.
 - Validation annotation schema inspected.
