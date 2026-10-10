@@ -13,6 +13,10 @@ The intended output is an auditable research result: each abnormal-tooth box is
 associated with a quadrant, tooth number, FDI number, diagnosis, confidence, and
 review status. It is not a diagnostic or treatment system.
 
+## 5-second project tour
+
+![DentXplain disease, anatomy, matching, evaluation, and delivery summary](docs/assets/demo.gif)
+
 ## Current status
 
 **Phase 5 — the locked evaluation, research demo, and public repository are
